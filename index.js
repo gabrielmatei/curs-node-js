@@ -1,15 +1,30 @@
 const express = require('express')
-const { catFact } = require('./api')
+const Furminator = require('./Furminator')
+const hackNSA = require('./MrRobot')
 
 const app = express()
 const port = 3000
 
-app.get('/cat-fact', (req, res) => {
-  catFact()
-    .then((body) => {
-      const { text } = body
-      res.send(text)
-    })
+app.get('/cat-fact', async (req, res) => {
+  const furminator = new Furminator()
+  const body = furminator.getFact()
+  furminator.factCount = 4
+  console.log(furminator.factCount)
+  body.then((body) => {
+    res.send(body.text)
+  })
+})
+
+app.get('/hack', async (req, res) => {
+  const furminator = new Furminator()
+
+  const { password } = await hackNSA()
+  const { text } = await furminator.getFact()
+
+  res.send({
+    password,
+    text
+  })
 })
 
 app.listen(port, _ => {
